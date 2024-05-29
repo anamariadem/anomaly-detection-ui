@@ -5,6 +5,7 @@ import { useMemo } from "react";
 interface PlotsComponentProps {
   tuples: PatientVitalsTuple[];
   field: string;
+  threshold: number;
 }
 
 type AnomalyScoreTuple = {
@@ -17,7 +18,7 @@ type Series = {
   data: AnomalyScoreTuple[];
 };
 
-const PlotComponent = ({ tuples, field }: PlotsComponentProps) => {
+const PlotComponent = ({ tuples, field, threshold }: PlotsComponentProps) => {
   const data: Series[] = [
     {
       label: `${field} anomaly score`,
@@ -31,7 +32,7 @@ const PlotComponent = ({ tuples, field }: PlotsComponentProps) => {
       label: "Threshold",
       data: tuples.map((tuple) => ({
         timestamp: new Date(tuple.timestamp),
-        anomalyValue: 0.9,
+        anomalyValue: threshold,
       })),
     },
   ];

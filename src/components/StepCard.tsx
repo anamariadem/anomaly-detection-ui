@@ -53,6 +53,9 @@ const steps: StepInfo[] = [
 const StepCard: React.FC = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [dropdownValue, setDropdownValue] = useState("");
+  const [windowSizeDropdownValue, setWindowSizeDropdownValue] = useState(100);
+  const [thresholdDropdownValue, setThresholdDropdownValue] = useState(0.9);
+  const [timeBetweenTuple, setTimeBetweenTuple] = useState(0.05);
 
   const [webSocket, setWebSocket] = useState<WebSocket>();
   const [tuples, setTuples] = useState<PatientVitalsTuple[]>([]);
@@ -106,9 +109,15 @@ const StepCard: React.FC = () => {
   }, []);
 
   const handleNext = () => {
-    webSocket?.send(
-      JSON.stringify({ event: "start", approach: dropdownValue }),
-    );
+    const objectToSend = {
+      event: "start",
+      approach: dropdownValue,
+      window_size: windowSizeDropdownValue,
+      threshold: thresholdDropdownValue,
+      sleep_time: timeBetweenTuple,
+    };
+
+    webSocket?.send(JSON.stringify(objectToSend));
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
   };
 
@@ -121,6 +130,21 @@ const StepCard: React.FC = () => {
 
   const handleDropdownChange = (event: any) => {
     setDropdownValue(event.target.value as string);
+  };
+
+  const handleWindowDropdownChange = (event: any) => {
+    const windowSize = Number(event.target.value as string);
+    setWindowSizeDropdownValue(windowSize);
+  };
+
+  const handleThresholdDropdownChange = (event: any) => {
+    const threshold = Number(event.target.value as string);
+    setThresholdDropdownValue(threshold);
+  };
+
+  const handleTimeBetweenTupleChange = (event: any) => {
+    const timeBetweenTuple = Number(event.target.value as string);
+    setTimeBetweenTuple(timeBetweenTuple);
   };
 
   const handleStopExecution = () => {
@@ -151,17 +175,19 @@ const StepCard: React.FC = () => {
             step={steps[activeStep]}
             dropdownValue={dropdownValue}
             onDropdownChange={handleDropdownChange}
-            options={[
-              { value: "half_space_trees", label: "Half Space Trees" },
-              { value: "gaussian_scorer", label: "Gaussian Scorer" },
-              { value: "local_outlier_factor", label: "Local Outlier Factor" },
-            ]}
+            onWindowSizeDropdownChange={handleWindowDropdownChange}
+            windowSizeDropdownValue={windowSizeDropdownValue}
+            onThresholdDropdownChange={handleThresholdDropdownChange}
+            thresholdDropdownValue={thresholdDropdownValue}
+            timeBetweenTupleDropdownValue={timeBetweenTuple}
+            onTimeBetweenTupleDropdownChange={handleTimeBetweenTupleChange}
           />
         ) : activeStep === 1 ? (
           <ExecutionStepComponent
             step={steps[activeStep]}
             tuples={tuplesToDiplay}
             warmup={warmup}
+            threshold={thresholdDropdownValue}
           />
         ) : (
           <div>
@@ -173,7 +199,12 @@ const StepCard: React.FC = () => {
             variant="contained"
             color="primary"
             onClick={handleNext}
-            disabled={!dropdownValue}
+            disabled={
+              !dropdownValue ||
+              !windowSizeDropdownValue ||
+              !thresholdDropdownValue ||
+              !timeBetweenTuple
+            }
             sx={{ marginTop: 2 }}
           >
             Next
@@ -222,7 +253,11 @@ const StepCard: React.FC = () => {
           <Box sx={style}>
             <Grid container spacing={3} sx={{ height: "100%", width: "100%" }}>
               <Grid item xs={12} sm={6} md={4} lg={3} key={"heart_rate"}>
-                <PlotComponent tuples={tuples} field={"heart_rate"} />
+                <PlotComponent
+                  tuples={tuples}
+                  field={"heart_rate"}
+                  threshold={thresholdDropdownValue}
+                />
               </Grid>
               <Grid
                 item
@@ -235,6 +270,7 @@ const StepCard: React.FC = () => {
                 <PlotComponent
                   tuples={tuples}
                   field={"systolic_blood_pressure"}
+                  threshold={thresholdDropdownValue}
                 />
               </Grid>
               <Grid
@@ -248,19 +284,36 @@ const StepCard: React.FC = () => {
                 <PlotComponent
                   tuples={tuples}
                   field={"diastolic_blood_pressure"}
+                  threshold={thresholdDropdownValue}
                 />
               </Grid>
               <Grid item xs={12} sm={6} md={4} lg={3} key={"temperature"}>
-                <PlotComponent tuples={tuples} field={"temperature"} />
+                <PlotComponent
+                  tuples={tuples}
+                  field={"temperature"}
+                  threshold={thresholdDropdownValue}
+                />
               </Grid>
               <Grid item xs={12} sm={6} md={4} lg={3} key={"oxygen_saturation"}>
-                <PlotComponent tuples={tuples} field={"oxygen_saturation"} />
+                <PlotComponent
+                  tuples={tuples}
+                  field={"oxygen_saturation"}
+                  threshold={thresholdDropdownValue}
+                />
               </Grid>
               <Grid item xs={12} sm={6} md={4} lg={3} key={"respiratory_rate"}>
-                <PlotComponent tuples={tuples} field={"respiratory_rate"} />
+                <PlotComponent
+                  tuples={tuples}
+                  field={"respiratory_rate"}
+                  threshold={thresholdDropdownValue}
+                />
               </Grid>
               <Grid item xs={12} sm={6} md={4} lg={3} key={"glucose"}>
-                <PlotComponent tuples={tuples} field={"glucose"} />
+                <PlotComponent
+                  tuples={tuples}
+                  field={"glucose"}
+                  threshold={thresholdDropdownValue}
+                />
               </Grid>
             </Grid>
           </Box>

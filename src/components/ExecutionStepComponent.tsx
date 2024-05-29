@@ -18,20 +18,23 @@ interface StepComponentProps {
   };
   tuples: PatientVitalsTuple[];
   warmup: number;
+  threshold: number;
 }
 
 const MyTableCell = ({
   value,
   anomalyScore,
+  threshold,
 }: {
   value: number;
   anomalyScore: number;
+  threshold: number;
 }) => {
   return (
     <TableCell
       sx={{
-        backgroundColor: anomalyScore > 0.9 ? "red" : "inherit",
-        color: anomalyScore > 0.9 ? "white" : "inherit",
+        backgroundColor: anomalyScore > threshold ? "red" : "inherit",
+        color: anomalyScore > threshold ? "white" : "inherit",
       }}
     >
       {value}
@@ -43,6 +46,7 @@ const ExecutionStepComponent = ({
   step,
   tuples,
   warmup,
+  threshold,
 }: StepComponentProps) => {
   return (
     <>
@@ -87,36 +91,43 @@ const ExecutionStepComponent = ({
                     <MyTableCell
                       value={tuple.heart_rate}
                       anomalyScore={tuple.anomaly_scores?.heart_rate || 0}
+                      threshold={threshold}
                     />
                     <MyTableCell
                       value={tuple.systolic_blood_pressure}
                       anomalyScore={
                         tuple.anomaly_scores?.systolic_blood_pressure || 0
                       }
+                      threshold={threshold}
                     />
                     <MyTableCell
                       value={tuple.diastolic_blood_pressure}
                       anomalyScore={
                         tuple.anomaly_scores?.diastolic_blood_pressure || 0
                       }
+                      threshold={threshold}
                     />
                     <MyTableCell
                       value={tuple.temperature}
                       anomalyScore={tuple.anomaly_scores?.temperature || 0}
+                      threshold={threshold}
                     />
                     <MyTableCell
                       value={tuple.oxygen_saturation}
                       anomalyScore={
                         tuple.anomaly_scores?.oxygen_saturation || 0
                       }
+                      threshold={threshold}
                     />
                     <MyTableCell
                       value={tuple.respiratory_rate}
                       anomalyScore={tuple.anomaly_scores?.respiratory_rate || 0}
+                      threshold={threshold}
                     />
                     <MyTableCell
                       value={tuple.glucose}
                       anomalyScore={tuple.anomaly_scores?.glucose || 0}
+                      threshold={threshold}
                     />
                   </TableRow>
                 ))}
